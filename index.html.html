@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Red Dot Game</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        background-color: #000;
+        color: #fff;
+    }
+    #gameContainer {
+        position: relative;
+        margin-top: 20px;
+        animation: fadeIn 1s ease-in-out;
+    }
+    #gameScreen {
+        width: 1000px;
+        height: 800px;
+        border: 2px solid black;
+        margin: 0 auto;
+        position: relative;
+        overflow: hidden;
+        border-radius: 10px;
+        background-color: #333;
+        box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.5);
+    }
+    #redDot {
+        width: 60px;
+        height: 60px;
+        background-color: red;
+        border-radius: 50%;
+        position: absolute;
+        animation: pulse 1s infinite alternate, move 2s infinite alternate;
+    }
+    #score {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        font-size: 36px;
+        color: #4caf50;
+    }
+    #timer {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        font-size: 36px;
+        color: #ff5722;
+    }
+    #title {
+        font-size: 48px;
+        font-weight: bold;
+        color: #ffeb3b;
+        margin-bottom: 20px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    }
+    
+    /* Animations */
+    @keyframes pulse {
+        0% {
+            transform: scale(1);
+        }
+        100% {
+            transform: scale(1.2);
+        }
+    }
+    
+    @keyframes move {
+        0% {
+            transform: translate(0, 0);
+        }
+        50% {
+            transform: translate(10px, 10px);
+        }
+        100% {
+            transform: translate(0, 0);
+        }
+    }
+    
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+</style>
+</head>
+<body>
+<div id="timer">Time left: <span id="timerValue">30</span> seconds</div>
+<div id="score">Score: <span id="scoreValue">0</span></div>
+<div id="gameContainer">
+    <h1 id="title">Red Dot</h1>
+    <div id="gameScreen">
+        <div id="redDot"></div>
+    </div>
+</div>
+
+<script>
+    let score = 0;
+    let timer = 30;
+    let timerInterval;
+    let firstClick = true;
+    const gameScreen = document.getElementById('gameScreen');
+    const redDot = document.getElementById('redDot');
+    const scoreValue = document.getElementById('scoreValue');
+    const timerValue = document.getElementById('timerValue');
+
+    function startGame() {
+        score = 0;
+        timer = 30;
+        updateScore();
+        updateTimer();
+        moveRedDot();
+        gameScreen.addEventListener('click', handleClick);
+    }
+
+    function updateScore() {
+        scoreValue.textContent = score;
+    }
+
+    function updateTimer() {
+        timerValue.textContent = timer;
+        timer--;
+        if (timer < 0) {
+            endGame();
+        }
+    }
+
+    function moveRedDot() {
+        const screenWidth = gameScreen.clientWidth;
+        const screenHeight = gameScreen.clientHeight;
+        const randomX = Math.floor(Math.random() * (screenWidth - 60));
+        const randomY = Math.floor(Math.random() * (screenHeight - 60));
+        redDot.style.left = randomX + 'px';
+        redDot.style.top = randomY + 'px';
+    }
+
+    function handleClick(event) {
+        if (firstClick) {
+            firstClick = false;
+            timerInterval = setInterval(updateTimer, 1000);
+        }
+        const redDotRect = redDot.getBoundingClientRect();
+        const mouseX = event.clientX;
+        const mouseY = event.clientY;
+
+        if (mouseX >= redDotRect.left && mouseX <= redDotRect.right &&
+            mouseY >= redDotRect.top && mouseY <= redDotRect.bottom) {
+            score++;
+            updateScore();
+            moveRedDot();
+        }
+    }
+
+    function endGame() {
+        firstClick = true;
+        clearInterval(timerInterval);
+        gameScreen.removeEventListener('click', handleClick);
+        alert('Game Over! Your final score is: ' + score);
+        startGame();
+    }
+
+    startGame();
+</script>
+</body>
+</html>
